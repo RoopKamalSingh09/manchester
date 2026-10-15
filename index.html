@@ -97,6 +97,64 @@
           min-height: max(884px, 100dvh);
         }
     </style>
+
+    <!-- FORM CONNECTION SCRIPT -->
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("quoteForm");
+
+        if (!form) return;
+
+        const scriptURL = "https://script.google.com/macros/s/AKfycbzz9YTTdfDqex5_qBYi7wcK6cSATbE_fQO277o9KI6x8w9w4reZbebuWbBEJuBu0SKY/exec";
+
+        // Create a hidden iframe to receive Google's response
+        const iframe = document.createElement("iframe");
+        iframe.name = "googleSheetResponse";
+        iframe.style.display = "none";
+        document.body.appendChild(iframe);
+
+        // Add spam protection field
+        const honeypot = document.createElement("input");
+        honeypot.type = "text";
+        honeypot.name = "website";
+        honeypot.autocomplete = "off";
+        honeypot.tabIndex = -1;
+        honeypot.style.display = "none";
+        form.appendChild(honeypot);
+
+        // Status message
+        const status = document.createElement("p");
+        status.setAttribute("role", "status");
+        status.setAttribute("aria-live", "polite");
+        // Add some basic styling to the status message so it looks good below the button
+        status.className = "text-center text-sm font-semibold mt-2 text-primary"; 
+        form.appendChild(status);
+
+        form.action = scriptURL;
+        form.method = "POST";
+        form.target = iframe.name;
+
+        let submitted = false;
+
+        iframe.addEventListener("load", function () {
+            if (!submitted) return;
+
+            submitted = false;
+            form.reset();
+            status.textContent =
+                "Thank you! Your quote request has been submitted.";
+            // Remove the inline alert since the script handles the success message
+        });
+
+        // We need to override the inline onsubmit to let this script run
+        form.removeAttribute("onsubmit");
+
+        form.addEventListener("submit", function () {
+            submitted = true;
+            status.textContent = "Submitting your request...";
+        });
+    });
+    </script>
 </head>
 <body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-100 font-sans antialiased selection:bg-amber-500 selection:text-white transition-colors duration-200">
 <header class="sticky top-0 z-50 bg-white/95 dark:bg-[#0b1526]/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors shadow-sm">
@@ -408,21 +466,22 @@
                 Fill in the details below. We review requests promptly and offer same-day site surveys for urgent repairs.
               </p>
 </div>
-<form action="#quote" class="space-y-4" method="POST" onsubmit="event.preventDefault(); alert('Thank you! Your quote request has been received. Our Manchester duty engineer will call you shortly.');">
+<!-- The inline onsubmit was removed because the new script handles submission -->
+<form id="quoteForm" action="#quote" class="space-y-4" method="POST">
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 <div>
-<label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5" for="full-name">Full Name *</label>
-<input class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" id="full-name" name="full-name" placeholder="e.g. David Harrison" required="" type="text"/>
+<label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5" for="name">Full Name *</label>
+<input class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" id="name" name="name" placeholder="e.g. David Harrison" required="" type="text"/>
 </div>
 <div>
-<label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5" for="phone-number">Phone Number *</label>
-<input class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" id="phone-number" name="phone-number" placeholder="e.g. 07700 900077" required="" type="tel"/>
+<label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5" for="phone">Phone Number *</label>
+<input class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" id="phone" name="phone" placeholder="e.g. 07700 900077" required="" type="tel"/>
 </div>
 </div>
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 <div>
-<label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5" for="service-needed">Service Required</label>
-<select class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" id="service-needed" name="service-needed">
+<label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5" for="service">Service Required</label>
+<select class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" id="service" name="service">
 <option value="emergency">24/7 Emergency Leak Repair</option>
 <option value="replacement">Complete Roof Replacement</option>
 <option value="flat">Flat Roof (GRP / Felt / EPDM)</option>
